@@ -1,7 +1,9 @@
 import 'package:control/control.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:richtexteditor/src/features/editor/controller/editor_controller.dart';
+import 'package:richtexteditor/src/features/editor/util/html_to_docx.dart';
 import 'package:richtexteditor/src/features/editor/widgets/editor_a4_page_widget.dart';
 import 'package:richtexteditor/src/features/editor/widgets/editor_config_widget.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
@@ -16,13 +18,55 @@ class EditorDesktopWidget extends StatefulWidget {
 class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
   late final EditorConfigWidgetState _scope = EditorConfigInhWidget.of(context);
 
-  void _send() {
+  String _buildHtml() {
     final delta = _scope.quillController.document.toDelta().toJson();
-    final html = QuillDeltaToHtmlConverter(
+    return QuillDeltaToHtmlConverter(
       List.castFrom<dynamic, Map<String, dynamic>>(delta),
       ConverterOptions.forEmail(),
     ).convert();
-    _scope.editorController.send(html: html, title: _scope.editorDataController.title);
+  }
+
+  void _send() =>
+      _scope.editorController.send(html: _buildHtml(), title: _scope.editorDataController.title);
+
+  Future<void> _saveAsWord() async {
+    final bytes = HtmlToDocx.build(_buildHtml());
+    final name = _scope.editorDataController.title.trim().isEmpty
+        ? 'document'
+        : _scope.editorDataController.title.trim();
+    final saved = await FileSaver.instance.saveFile(
+      name: name,
+      bytes: bytes,
+      ext: 'docx',
+      mimeType: MimeType.microsoftWord,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved: $saved')));
+  }
+
+  Future<void> _saveDraft() async {
+    final delta = _scope.quillController.document.toDelta().toJson();
+    await _scope.editorController.saveDraft(
+      title: _scope.editorDataController.title,
+      html: _buildHtml(),
+      deltaJson: delta,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Draft saved')));
+  }
+
+  Future<void> _loadDraft() async {
+    final draft = await _scope.editorController.loadDraft();
+    if (!mounted) return;
+    if (draft == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No saved draft')));
+      return;
+    }
+    _scope.quillController.document = quill.Document.fromJson(draft.deltaJson);
+    _scope.editorDataController.setTitle(draft.title);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Loaded draft from ${draft.savedAt}')));
   }
 
   @override
@@ -58,6 +102,36 @@ class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
           ),
         ),
         const SizedBox(width: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: OutlinedButton.icon(
+            onPressed: _saveDraft,
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save'),
+          ),
+        ),
+        const SizedBox(width: 4),
+        ValueListenableBuilder<bool>(
+          valueListenable: _scope.editorController.hasDraft,
+          builder: (context, hasDraft, _) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: OutlinedButton.icon(
+              onPressed: hasDraft ? _loadDraft : null,
+              icon: const Icon(Icons.folder_open_outlined),
+              label: const Text('Load'),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: OutlinedButton.icon(
+            onPressed: _saveAsWord,
+            icon: const Icon(Icons.description_outlined),
+            label: const Text('Save as Word'),
+          ),
+        ),
+        const SizedBox(width: 8),
         StateConsumer<EditorController, EditorState>(
           controller: _scope.editorController,
           listener: (context, controller, oldState, newState) {

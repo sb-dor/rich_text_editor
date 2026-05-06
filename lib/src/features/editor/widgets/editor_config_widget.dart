@@ -36,7 +36,13 @@ class EditorConfigWidgetState extends State<EditorConfigWidget> {
     editorFocusNode = FocusNode();
     editorScrollController = ScrollController();
     editorDataController = EditorDataController();
-    editorController = EditorController(repository: EditorRepositoryImpl(dio: dependencies.dio));
+    editorController = EditorController(
+      repository: EditorRepositoryImpl(
+        dio: dependencies.dio,
+        sharedPreferences: dependencies.sharedPreferences,
+      ),
+    );
+    editorController.refreshHasDraft();
   }
 
   @override

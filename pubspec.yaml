@@ -98,6 +98,10 @@ dependencies:
   flutter_quill: ^11.4.0
   vsc_quill_delta_to_html: ^1.0.5
 
+  # Word (.docx) export
+  archive: ^4.0.0
+  file_saver: ^0.2.14
+
   meta: any
   json_annotation: any
 dev_dependencies:

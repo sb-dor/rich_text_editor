@@ -65,6 +65,10 @@ class EditorController extends StateController<EditorState> with DroppableContro
 
   final IEditorRepository _repository;
 
+  /// Reactive flag — true when a draft exists in local storage.
+  /// UI should listen and disable / enable the "Load" button accordingly.
+  final ValueNotifier<bool> hasDraft = ValueNotifier<bool>(false);
+
   void send({required String html, String? title}) => handle(() async {
     setState(const EditorState.inProgress());
     final id = await _repository.uploadHtml(html: html, title: title);
@@ -72,4 +76,33 @@ class EditorController extends StateController<EditorState> with DroppableContro
   }, error: (e, st) async => setState(EditorState.error(e.toString())));
 
   void reset() => setState(const EditorState.idle());
+
+  /// Persist the editor's current document locally. Returns when stored.
+  Future<void> saveDraft({
+    required String title,
+    required String html,
+    required List<dynamic> deltaJson,
+  }) async {
+    await _repository.saveDraft(title: title, html: html, deltaJson: deltaJson);
+    hasDraft.value = true;
+  }
+
+  /// Read the stored draft (if any). Caller is responsible for applying the
+  /// returned [EditorDraft.deltaJson] to the [QuillController].
+  Future<EditorDraft?> loadDraft() => _repository.loadDraft();
+
+  /// Refresh [hasDraft] — call once at startup so the UI reflects whether
+  /// there's anything to load.
+  Future<void> refreshHasDraft() async => hasDraft.value = await _repository.hasDraft();
+
+  Future<void> clearDraft() async {
+    await _repository.clearDraft();
+    hasDraft.value = false;
+  }
+
+  @override
+  void dispose() {
+    hasDraft.dispose();
+    super.dispose();
+  }
 }
