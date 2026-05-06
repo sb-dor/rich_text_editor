@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:richtexteditor/src/common/widget/history_button.dart';
 import 'package:richtexteditor/src/features/account/widget/profile_icon_button.dart';
-import 'package:richtexteditor/src/features/authentication/widget/log_out_button.dart';
 import 'package:richtexteditor/src/features/developer/widget/developer_button.dart';
 
 class CommonActions extends ListBase<Widget> {
@@ -14,7 +13,6 @@ class CommonActions extends ListBase<Widget> {
         if (!kReleaseMode) const DeveloperButton(),
         const HistoryButton(),
         const ProfileIconButton(),
-        const LogOutButton(),
       ];
 
   final List<Widget> _actions;

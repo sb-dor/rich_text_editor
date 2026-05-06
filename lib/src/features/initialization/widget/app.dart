@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:octopus/octopus.dart';
 import 'package:richtexteditor/src/common/constant/config.dart';
 import 'package:richtexteditor/src/common/localization/localization.dart';
 import 'package:richtexteditor/src/common/router/router_state_mixin.dart';
 import 'package:richtexteditor/src/common/util/performance_overlay_tool.dart';
 import 'package:richtexteditor/src/common/widget/window_scope.dart';
-import 'package:richtexteditor/src/features/authentication/widget/authentication_scope.dart';
 
 /// {@template app}
 /// App widget.
@@ -49,6 +49,7 @@ class _AppState extends State<App> with RouterStateMixin {
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
       Localization.delegate,
+      FlutterQuillLocalizations.delegate,
     ],
     supportedLocales: Localization.supportedLocales,
     // locale: const Locale("en"),
@@ -72,7 +73,7 @@ class _AppState extends State<App> with RouterStateMixin {
             child: Banner(
               location: BannerLocation.topEnd,
               message: _buildBannerMessage(),
-              child: AuthenticationScope(child: child ?? const SizedBox.shrink()),
+              child: child ?? const SizedBox.shrink(),
             ),
           ),
         ),

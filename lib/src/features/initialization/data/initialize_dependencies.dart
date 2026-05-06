@@ -9,8 +9,6 @@ import 'package:richtexteditor/src/common/constant/pubspec.yaml.g.dart';
 import 'package:richtexteditor/src/common/controller/controller_observer.dart';
 import 'package:richtexteditor/src/common/model/app_metadata.dart';
 import 'package:richtexteditor/src/common/util/screen_util.dart';
-import 'package:richtexteditor/src/features/authentication/controller/authentication_controller.dart';
-import 'package:richtexteditor/src/features/authentication/data/authentication_repository.dart';
 import 'package:richtexteditor/src/features/initialization/data/platform/platform_initialization.dart';
 import 'package:richtexteditor/src/features/initialization/models/dependencies.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,35 +65,14 @@ final Map<String, _InitializationStep> _initializationSteps = <String, _Initiali
   'Get remote config': (_) {},
   'Restore settings': (_) {},
   'Initialize Dio': (dependencies) {
-    dependencies.dio =
-        Dio(
-            BaseOptions(
-              baseUrl: Config.apiBaseUrl,
-              connectTimeout: Config.apiConnectTimeout,
-              receiveTimeout: Config.apiReceiveTimeout,
-            ),
-          )
-          ..interceptors.add(
-            InterceptorsWrapper(
-              onRequest: (options, handler) {
-                final token = dependencies.sharedPreferences.getString('auth_token');
-                if (token != null) {
-                  options.headers['Authorization'] = 'Bearer $token';
-                }
-                handler.next(options);
-              },
-            ),
-          );
-  },
-  'Prepare authentication controller': (dependencies) {
-    dependencies.authenticationController = AuthenticationController(
-      repository: AuthenticationRepositoryImpl(
-        dio: dependencies.dio,
-        sharedPreferences: dependencies.sharedPreferences,
+    dependencies.dio = Dio(
+      BaseOptions(
+        baseUrl: Config.apiBaseUrl,
+        connectTimeout: Config.apiConnectTimeout,
+        receiveTimeout: Config.apiReceiveTimeout,
       ),
     );
   },
-  'Restore session': (dependencies) => dependencies.authenticationController.restoreSession(),
 
   // The 'Shrink database' step will only be included in non-release build
 };

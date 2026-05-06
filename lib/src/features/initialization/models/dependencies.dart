@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:richtexteditor/src/common/model/app_metadata.dart';
-import 'package:richtexteditor/src/features/authentication/controller/authentication_controller.dart';
 import 'package:richtexteditor/src/features/initialization/widget/dependencies_scope.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,11 +25,8 @@ class Dependencies {
   /// App metadata
   late final AppMetadata metadata;
 
-  /// Shared Dio HTTP client (base URL + auth interceptor)
+  /// Shared Dio HTTP client
   late final Dio dio;
-
-  /// Authentication controller
-  late final AuthenticationController authenticationController;
 
   @override
   String toString() => 'Dependencies{}';

@@ -1,7 +1,6 @@
 import 'package:octopus/octopus.dart';
 import 'package:richtexteditor/src/common/router/routes.dart';
 import 'package:richtexteditor/src/common/widget/scaffold_padding.dart';
-import 'package:richtexteditor/src/features/authentication/widget/log_out_button.dart';
 import 'package:ui/ui.dart';
 
 /// {@template profile_screen}
@@ -82,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(height: 1),
                   ),
-                  trailing: const LogOutButton(),
+                  trailing: const SizedBox.shrink(),
                 ),
               ),
               const SizedBox(width: 16),
