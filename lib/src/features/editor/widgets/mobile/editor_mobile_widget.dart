@@ -6,6 +6,7 @@ import 'package:richtexteditor/src/features/editor/controller/editor_controller.
 import 'package:richtexteditor/src/features/editor/util/html_to_docx.dart';
 import 'package:richtexteditor/src/features/editor/widgets/editor_a4_page_widget.dart';
 import 'package:richtexteditor/src/features/editor/widgets/editor_config_widget.dart';
+import 'package:richtexteditor/src/features/editor/widgets/editor_merge_fields_bar.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class EditorMobileWidget extends StatefulWidget {
@@ -137,6 +138,7 @@ class _EditorMobileWidgetState extends State<EditorMobileWidget> {
             ),
           ),
         ),
+        EditorMergeFieldsBar(controller: _scope.quillController),
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
