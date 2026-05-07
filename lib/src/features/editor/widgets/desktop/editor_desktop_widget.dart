@@ -33,7 +33,7 @@ class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
   String _buildHtml() {
     final delta = _scope.quillController.document.toDelta().toJson();
     return QuillDeltaToHtmlConverter(
-      List.castFrom<dynamic, Map<String, dynamic>>(delta),
+      List.castFrom<Object?, Map<String, Object?>>(delta),
       ConverterOptions.forEmail(),
     ).convert();
   }

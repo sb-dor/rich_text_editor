@@ -21,8 +21,19 @@ class MergeField {
 
 /// Built-in merge fields. Add new entries here.
 const List<MergeField> kAvailableMergeFields = <MergeField>[
-  MergeField(id: 'customer_name', label: 'Customer Name'),
-  MergeField(id: 'customer_passport_num', label: 'Passport #'),
+  MergeField(id: 'client_name', label: 'Client Name'),
+  MergeField(id: 'client_passport_num', label: 'Passport #'),
   MergeField(id: 'contract_date', label: 'Contract Date'),
   MergeField(id: 'contract_num', label: 'Contract #'),
+  MergeField(id: 'date', label: 'Date'),
+  MergeField(id: 'unit_number', label: 'Unit Number'),
+  MergeField(id: 'project_name', label: 'Project Name'),
+  MergeField(id: 'building_name', label: 'Building Name'),
+  MergeField(id: 'floor', label: 'Floor'),
+  MergeField(id: 'area_sqm', label: 'Area (sqm)'),
+  MergeField(id: 'total_price', label: 'Total Price'),
+  MergeField(id: 'currency', label: 'Currency'),
+  MergeField(id: 'initial_payment', label: 'Initial Payment'),
+  MergeField(id: 'installment_months', label: 'Installment Months'),
+  MergeField(id: 'seller_name', label: 'Seller Name'),
 ];
