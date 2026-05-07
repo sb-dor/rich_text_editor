@@ -1,6 +1,7 @@
 import 'package:control/control.dart';
 import 'package:flutter/foundation.dart';
 import 'package:richtexteditor/src/features/editor/data/editor_repository.dart';
+import 'package:richtexteditor/src/features/editor/models/editor_draft.dart';
 
 @immutable
 sealed class EditorState {

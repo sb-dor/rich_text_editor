@@ -2,24 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:l/l.dart';
+import 'package:richtexteditor/src/features/editor/models/editor_draft.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A locally-persisted draft of an in-progress document.
-class EditorDraft {
-  const EditorDraft({
-    required this.title,
-    required this.html,
-    required this.deltaJson,
-    required this.savedAt,
-  });
-
-  final String title;
-  final String html;
-
-  /// Quill `Delta` operations as JSON.
-  final List<dynamic> deltaJson;
-  final DateTime savedAt;
-}
 
 abstract interface class IEditorRepository {
   Future<String> uploadHtml({required String html, String? title});

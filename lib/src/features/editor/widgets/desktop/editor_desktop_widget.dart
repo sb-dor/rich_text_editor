@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:control/control.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:richtexteditor/src/features/editor/controller/editor_controller.dart';
 import 'package:richtexteditor/src/features/editor/util/html_to_docx.dart';
 import 'package:richtexteditor/src/features/editor/widgets/editor_a4_page_widget.dart';
@@ -14,6 +19,12 @@ class EditorDesktopWidget extends StatefulWidget {
   @override
   State<EditorDesktopWidget> createState() => _EditorDesktopWidgetState();
 }
+
+/// Numeric font-size dropdown values, 9 → 40 px (plus a clear option).
+final Map<String, String> _fontSizeItems = <String, String>{
+  for (var px = 9; px <= 40; px++) '$px': '$px',
+  'Clear': '0',
+};
 
 class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
   late final EditorConfigWidgetState _scope = EditorConfigInhWidget.of(context);
@@ -29,18 +40,43 @@ class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
   void _send() =>
       _scope.editorController.send(html: _buildHtml(), title: _scope.editorDataController.title);
 
+  Future<void> _openInWord() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Opening files is not supported on web')));
+      return;
+    }
+    final bytes = HtmlToDocx.build(_buildHtml());
+    final name = _scope.editorDataController.title.trim().isEmpty
+        ? 'document'
+        : _scope.editorDataController.title.trim();
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/$name.docx');
+    await file.writeAsBytes(bytes, flush: true);
+
+    final result = await OpenFilex.open(file.path);
+    if (!mounted) return;
+    if (result.type != ResultType.done) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open: ${result.message}')));
+    }
+  }
+
   Future<void> _saveAsWord() async {
     final bytes = HtmlToDocx.build(_buildHtml());
     final name = _scope.editorDataController.title.trim().isEmpty
         ? 'document'
         : _scope.editorDataController.title.trim();
-    final saved = await FileSaver.instance.saveFile(
+    final saved = await FileSaver.instance.saveAs(
       name: name,
       bytes: bytes,
       ext: 'docx',
       mimeType: MimeType.microsoftWord,
     );
     if (!mounted) return;
+    if (saved == null) return; // user cancelled the save dialog
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved: $saved')));
   }
 
@@ -131,6 +167,15 @@ class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
             label: const Text('Save as Word'),
           ),
         ),
+        const SizedBox(width: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: OutlinedButton.icon(
+            onPressed: _openInWord,
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Open in Word'),
+          ),
+        ),
         const SizedBox(width: 8),
         StateConsumer<EditorController, EditorState>(
           controller: _scope.editorController,
@@ -172,12 +217,15 @@ class _EditorDesktopWidgetState extends State<EditorDesktopWidget> {
           color: Theme.of(context).colorScheme.surface,
           child: quill.QuillSimpleToolbar(
             controller: _scope.quillController,
-            config: const quill.QuillSimpleToolbarConfig(
+            config: quill.QuillSimpleToolbarConfig(
               showAlignmentButtons: true,
               showFontFamily: false,
               showFontSize: true,
               showSearchButton: false,
               multiRowsDisplay: false,
+              buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+                fontSize: quill.QuillToolbarFontSizeButtonOptions(items: _fontSizeItems),
+              ),
             ),
           ),
         ),

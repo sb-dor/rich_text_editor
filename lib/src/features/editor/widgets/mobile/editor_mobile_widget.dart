@@ -34,13 +34,14 @@ class _EditorMobileWidgetState extends State<EditorMobileWidget> {
     final name = _scope.editorDataController.title.trim().isEmpty
         ? 'document'
         : _scope.editorDataController.title.trim();
-    final saved = await FileSaver.instance.saveFile(
+    final saved = await FileSaver.instance.saveAs(
       name: name,
       bytes: bytes,
       ext: 'docx',
       mimeType: MimeType.microsoftWord,
     );
     if (!mounted) return;
+    if (saved == null) return; // user cancelled the save dialog
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved: $saved')));
   }
 
