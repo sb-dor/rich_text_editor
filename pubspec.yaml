@@ -51,7 +51,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  intl_utils: ^2.8.14
+  intl_utils: ^2.8.15
 
   # Routing
   octopus: ^0.0.9
